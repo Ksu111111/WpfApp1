@@ -6,6 +6,24 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="MainWindow" Height="650" Width="800">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="FontSize" Value="30" />
+            <Setter Property="Content" Value="Загрузить" />
+            <Setter Property="FontFamily" Value="Verdana" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Margin" Value="10" />
+            <Setter Property="Padding" Value="10" />
+        </Style>
+        <Style TargetType="DataGrid">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontFamily" Value="Verdana" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Margin" Value="10" />
+            <Setter Property="MinHeight" Value="300" />
+        </Style>
+    </Window.Resources>
     <Grid>
         <TabControl>
             <TabItem>
@@ -14,9 +32,122 @@
                 </TabItem.Header>
                 <TabItem.Content>
                     <StackPanel>
-                        <DataGrid Name="fullTable" ItemsSource="{Binding}" Margin="10" Background="White" MinHeight="500" FontSize="20"></DataGrid>
-                        <Button Content="Загрузить" Margin="10" Background="White" FontSize="30" MaxWidth="150" Click="Button_Click"></Button>
-                    </StackPanel>                    
+                        <DataGrid Name="fullTable" ItemsSource="{Binding}"></DataGrid>
+                        <Button Click="Button_Click"></Button>
+                    </StackPanel>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock>Цвета и названия из бд</TextBlock>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Left" Width="400">
+                            <TextBlock Margin="10" FontSize="20">Цвета из бд</TextBlock>
+                            <DataGrid Name="colorTable" ItemsSource="{Binding}"></DataGrid>
+                            <Button Click="Button_Click_1"></Button>
+                        </StackPanel>
+                        <StackPanel DockPanel.Dock="Right" Width="400">
+                            <TextBlock Margin="10" FontSize="20">Названия из бд</TextBlock>
+                            <DataGrid Name="titleTable" ItemsSource="{Binding}"></DataGrid>
+                            <Button Click="Button_Click_2"></Button>
+                        </StackPanel>
+                    </DockPanel>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>Калорийность</TabItem.Header>
+                <TabItem.Content>
+                    <StackPanel>
+                        <TextBlock Margin="10" FontSize="15">Показать максимальную калорийность</TextBlock>
+                        <TextBox Margin="10" FontSize="15" Name="maxCaloric"></TextBox>
+                        <Button FontSize="15" Click="Button_Click_3"></Button>
+                        <TextBlock Margin="10" FontSize="15">Показать минимальную калорийность</TextBlock>
+                        <TextBox Margin="10" FontSize="15" Name="minCaloric"></TextBox>
+                        <Button FontSize="15" Click="Button_Click_4"></Button>
+                        <TextBlock Margin="10" FontSize="15">Показать среднюю калорийность</TextBlock>
+                        <TextBox Margin="10" FontSize="15" Name="avgCaloric"></TextBox>
+                        <Button FontSize="15" Click="Button_Click_5"></Button>
+                    </StackPanel>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    Количесвто чего-нибудь
+                </TabItem.Header>
+                <TabItem.Content>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Width="200" HorizontalAlignment="Left">
+                            <TextBlock FontSize="20">Kоличество овощей</TextBlock>
+                            <TextBox FontSize="20" Name="CountV" Margin="10"></TextBox>
+                            <Button FontSize="20" Click="Button_Click_6"></Button>
+                            <TextBlock FontSize="20">Kоличество фруктов</TextBlock>
+                            <TextBox FontSize="20" Name="countF" Margin="10"></TextBox>
+                            <Button FontSize="20" Click="Button_Click_7"></Button>
+                        </StackPanel>
+                        <StackPanel Width="576" HorizontalAlignment="Left" Grid.ColumnSpan="2" Margin="218,0,0,0">
+                            <TextBlock FontSize="20">Kоличество овощей и фруктов заданного цвета</TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="25" Margin="10">Цвет</TextBlock>
+                                <TextBox x:Name="colorTextBox" MinWidth="150" Margin="10" FontSize="25"></TextBox>
+                            </StackPanel>
+                            <TextBox FontSize="20" x:Name="countVAF" Margin="10"></TextBox>
+                            <Button FontSize="20" Click="Button_Click_9"></Button>
+                            <TextBlock FontSize="20">Показать количество овощей фруктов каждого цвета</TextBlock>
+                            <DataGrid Name="countTable" ItemsSource="{Binding}"></DataGrid>
+                            <Button FontSize="20" Click="Button_Click_8"></Button>
+                        </StackPanel>
+                    </Grid>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    Таблицы с калорийностью
+                </TabItem.Header>
+                <TabItem.Content>                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock>Показать овощи и фрукты<LineBreak/> с калорийностью ниже указанной<LineBreak/></TextBlock>
+                            <TextBox Margin="5" Name="Min"></TextBox>
+                            <Button FontSize="20" Click="Button_Click_10"></Button>
+                            <DataGrid Name="caloricMinTable" ItemsSource="{Binding}"></DataGrid>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock>Показать овощи и фрукты<LineBreak/> с калорийностью выше указанной<LineBreak/></TextBlock>
+                            <TextBox Margin="5" Name="Max"></TextBox>
+                            <Button FontSize="20" Click="Button_Click_11"></Button>
+                            <DataGrid Name="caloricMaxTable" ItemsSource="{Binding}"></DataGrid>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock> Показать овощи и фрукты<LineBreak/> с калорийностью в указанном диапазоне<LineBreak/></TextBlock>
+                            <TextBox Margin="5" Name="MinB"></TextBox>
+                            <TextBox Margin="5" Name="MaxB"></TextBox>
+                            <Button FontSize="20" Click="Button_Click_12"></Button>
+                            <DataGrid Name="caloricBetweenTable" ItemsSource="{Binding}"></DataGrid>
+                        </StackPanel>
+                    </Grid>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                   Запрос
+                </TabItem.Header>
+                <TabItem.Content>
+                    <StackPanel>
+                        <TextBlock>Показать все овощи и фрукты, у которых цвет желтый или красный</TextBlock>
+                        <DataGrid Name="colorYRTable" ItemsSource="{Binding}"></DataGrid>
+                        <Button Click="Button_Click_13"></Button>
+                    </StackPanel>
                 </TabItem.Content>
             </TabItem>
         </TabControl>

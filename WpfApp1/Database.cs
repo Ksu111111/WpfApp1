@@ -7,13 +7,14 @@ using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace workingWithSql
 {
     internal class Database
     {
         SqlConnection connection = new SqlConnection(@"Data Source=DESKTOP-CD3JPIF\SQLEXPRESS;Initial Catalog=VegetablesAndFruits;Integrated Security=SSPI");
-        public SqlConnection OpenConnection()
+        private SqlConnection OpenConnection()
         {
             if (connection != null && connection.State == System.Data.ConnectionState.Closed)
             {
@@ -23,7 +24,7 @@ namespace workingWithSql
             else
                 return null;
         }
-        public void CloseConnection()
+        private void CloseConnection()
         {
             if (connection != null && connection.State == System.Data.ConnectionState.Open)
                 connection.Close();            
@@ -52,197 +53,251 @@ namespace workingWithSql
             else
                 return null;
         }
-        public void OutputAllTitle()
+        public DataTable OutputAllTitle()
         {
-            Console.WriteLine("-Отображение всех названий овощей и фруктов-");
+            DataTable dataTable = new DataTable();
+            connection = OpenConnection();
             if (connection != null)
             {
                 SqlCommand cmd = new SqlCommand("select title_k from Table_f group by title_k", connection);
                 SqlDataReader reader = cmd.ExecuteReader();
+                for (int i = 0; i < reader.FieldCount; i++)
+                    dataTable.Columns.Add(reader.GetName(i));
                 while (reader.Read())
-                    for(int i = 0; i < reader.FieldCount; i++)
-                        Console.WriteLine(String.Format("\t|{0,11}|", reader[i]));            
-                Console.WriteLine();
+                {
+                    DataRow dataRow = dataTable.NewRow();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                        dataRow[i] = reader[i];
+                    dataTable.Rows.Add(dataRow);
+                }
                 reader?.Close();
+                CloseConnection();
+                return dataTable;
             }
             else
-                Console.WriteLine("Соединение с бд не установленно");
-            Console.WriteLine();
+                return null;
         }
-        public void OutputAllColor()
+        public DataTable OutputAllColor()
         {
-            Console.WriteLine("-Отображение всех цветов-");
+            DataTable dataTable = new DataTable();
+            connection = OpenConnection();
             if (connection != null)
             {
                 SqlCommand cmd = new SqlCommand("select color_k from Table_f  group by color_k", connection);
                 SqlDataReader reader = cmd.ExecuteReader();
+                for (int i = 0; i < reader.FieldCount; i++)
+                    dataTable.Columns.Add(reader.GetName(i));
                 while (reader.Read())
+                {
+                    DataRow dataRow = dataTable.NewRow();
                     for (int i = 0; i < reader.FieldCount; i++)
-                        Console.WriteLine(String.Format("\t|{0,11}|", reader[i]));
-                Console.WriteLine();
+                        dataRow[i] = reader[i];
+                    dataTable.Rows.Add(dataRow);
+                }
                 reader?.Close();
+                CloseConnection();
+                return dataTable;
             }
             else
-                Console.WriteLine("Соединение с бд не установленно");
-            Console.WriteLine();
+                return null;
         }
-        public void MaximumCaloric()
+        public object MaximumCaloric()
         {
-            Console.WriteLine("-Показать максимальную калорийность-");
+            connection = OpenConnection();
             if (connection != null)
             {
                 SqlCommand cmd = new SqlCommand("select max(caloric_k) from Table_f", connection);
-                Console.WriteLine($"max = {cmd.ExecuteScalar()}");
+                var result = cmd.ExecuteScalar();
+                CloseConnection();
+                return result;
             }
             else
-                Console.WriteLine("Соединение с бд не установленно");
-            Console.WriteLine();
+                return null;
         }
-        public void MinimumCaloric()
+        public object MinimumCaloric()
         {
-            Console.WriteLine("-Показать минимальную калорийность-");
+            connection = OpenConnection();
             if (connection != null)
             {
                 SqlCommand cmd = new SqlCommand("select min(caloric_k) from Table_f", connection);
-                Console.WriteLine($"min = {cmd.ExecuteScalar()}");
+                var result = cmd.ExecuteScalar();
+                CloseConnection();
+                return result;
             }
             else
-                Console.WriteLine("Соединение с бд не установленно");
-            Console.WriteLine();
+                return null;
         }
-        public void AverageCaloric()
+        public object AverageCaloric()
         {
-            Console.WriteLine("-Показать среднюю калорийность-");
+            connection = OpenConnection();
             if (connection != null)
             {
                 SqlCommand cmd = new SqlCommand("select avg(caloric_k) from Table_f", connection);
-                Console.WriteLine($"avg = {cmd.ExecuteScalar()}");
+                var result = cmd.ExecuteScalar();
+                CloseConnection();
+                return result;
             }
             else
-                Console.WriteLine("Соединение с бд не установленно");
-            Console.WriteLine();
+                return null;
         }
-        public void NumberVegetables()
+        public object NumberVegetables()
         {
-            Console.WriteLine("-Показать количество овощей-");
-            if (connection != null) 
+            connection = OpenConnection();
+            if (connection != null)
             {
                 SqlCommand cmd = new SqlCommand("select count(type_k) from Table_f as T where T.type_k = 'овощ';", connection);
-                Console.WriteLine($"count = {cmd.ExecuteScalar()}");
+                var result = cmd.ExecuteScalar();
+                CloseConnection();
+                return result;
             }
             else
-                Console.WriteLine("Соединение с бд не установленно");
-            Console.WriteLine();
+                return null;
         }
-        public void NumberFruits()
+        public object NumberFruits()
         {
-            Console.WriteLine("-Показать количество фруктов-");
+            connection = OpenConnection();
             if (connection != null)
             {
                 SqlCommand cmd = new SqlCommand("select count(type_k) from Table_f as T where T.type_k = 'фрукт';", connection);
-                Console.WriteLine($"count = {cmd.ExecuteScalar()}");
+                var result = cmd.ExecuteScalar();
+                CloseConnection();
+                return result;
             }
             else
-                Console.WriteLine("Соединение с бд не установленно");
-            Console.WriteLine();
+                return null;
         }
-        public void CountVegetablesAndFruits()
+        public object CountVegetablesAndFruits(string color)
         {
-            Console.WriteLine("-Показать количество овощей и фруктов заданного цвета-");
+            connection = OpenConnection();
             if (connection != null)
             {
-                Console.Write("color - ");
-                string color = Console.ReadLine();
-                SqlCommand cmd = new SqlCommand($"select count(id) " +
-                    $"from Table_f where color_k = '{color}'", connection);
-                Console.WriteLine($"count = {cmd.ExecuteScalar()}");
+                SqlCommand cmd = new SqlCommand($"select count(id) from Table_f where color_k = '{color}'", connection);
+                var result = cmd.ExecuteScalar();
+                CloseConnection();
+                return result;
             }
             else
-                Console.WriteLine("Соединение с бд не установленно");
-            Console.WriteLine();
+                return null;
         }
-        public void PrintCountVAF()
+        public DataTable PrintCountVAF()
         {
-            Console.WriteLine("-Показать количество овощей фруктов каждого цвета-");
+            DataTable dataTable = new DataTable();
+            connection = OpenConnection();
             if (connection != null)
             {
                 SqlCommand cmd = new SqlCommand("select color_k, count(id) from Table_f group by color_k;", connection);
                 SqlDataReader reader = cmd.ExecuteReader();
+                for (int i = 0; i < reader.FieldCount; i++)
+                    dataTable.Columns.Add(reader.GetName(i));
                 while (reader.Read())
-                    Console.WriteLine(String.Format("|{0,11}|{1,6}|", reader[0], reader[1]));
+                {
+                    DataRow dataRow = dataTable.NewRow();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                        dataRow[i] = reader[i];
+                    dataTable.Rows.Add(dataRow);
+                }
                 reader?.Close();
+                CloseConnection();
+                return dataTable;
             }
             else
-                Console.WriteLine("Соединение с бд не установленно");
-            Console.WriteLine();
+                return null;
         }
-        public void PrintLessCaloric()
+        public DataTable PrintLessCaloric(int caloric)
         {
-            Console.WriteLine("-Показать овощи и фрукты с калорийностью ниже yказанной-");
+            DataTable dataTable = new DataTable();
+            connection = OpenConnection();
             if (connection != null)
             {
-                Console.Write("caloric - ");
-                int caloric = Convert.ToInt32(Console.ReadLine());
                 SqlCommand cmd = new SqlCommand($"select title_k, caloric_k from Table_f where caloric_k < {caloric};", connection);
                 SqlDataReader reader = cmd.ExecuteReader();
+                for (int i = 0; i < reader.FieldCount; i++)
+                    dataTable.Columns.Add(reader.GetName(i));
                 while (reader.Read())
-                    Console.WriteLine(String.Format("|{0,11}|{1, 4}|", reader[0], reader[1]));
+                {
+                    DataRow dataRow = dataTable.NewRow();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                        dataRow[i] = reader[i];
+                    dataTable.Rows.Add(dataRow);
+                }
                 reader?.Close();
+                CloseConnection();
+                return dataTable;
             }
             else
-                Console.WriteLine("Соединение с бд не установленно");
-            Console.WriteLine();
+                return null;
         }
-        public void PrintMoreCaloric()
+        public DataTable PrintMoreCaloric(int caloric)
         {
-            Console.WriteLine("-Показать овощи и фрукты с калорийностью выше указанной-");
+            DataTable dataTable = new DataTable();
+            connection = OpenConnection();
             if (connection != null)
             {
-                Console.Write("caloric - ");
-                int caloric = Convert.ToInt32(Console.ReadLine());
                 SqlCommand cmd = new SqlCommand($"select title_k, caloric_k from Table_f where caloric_k > {caloric};", connection);
                 SqlDataReader reader = cmd.ExecuteReader();
+                for (int i = 0; i < reader.FieldCount; i++)
+                    dataTable.Columns.Add(reader.GetName(i));
                 while (reader.Read())
-                    Console.WriteLine(String.Format("|{0,11}|{1, 4}|", reader[0], reader[1]));
+                {
+                    DataRow dataRow = dataTable.NewRow();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                        dataRow[i] = reader[i];
+                    dataTable.Rows.Add(dataRow);
+                }
                 reader?.Close();
+                CloseConnection();
+                return dataTable;
             }
             else
-                Console.WriteLine("Соединение с бд не установленно");
-            Console.WriteLine();
+                return null;
         }
-        public void PrintBetweenCaloric()
+        public DataTable PrintBetweenCaloric(int caloric1, int caloric2)
         {
-            Console.WriteLine("-Показать овощи и фрукты с калорийностью в указанном диапазоне-");
+            DataTable dataTable = new DataTable();
+            connection = OpenConnection();
             if (connection != null)
             {
-                Console.Write("caloric - ");
-                int caloric1 = Convert.ToInt32(Console.ReadLine());
-                Console.Write("caloric - ");
-                int caloric2 = Convert.ToInt32(Console.ReadLine());
                 SqlCommand cmd = new SqlCommand($"select title_k, caloric_k  from Table_f where caloric_k between {caloric1} and {caloric2};", connection);
                 SqlDataReader reader = cmd.ExecuteReader();
+                for (int i = 0; i < reader.FieldCount; i++)
+                    dataTable.Columns.Add(reader.GetName(i));
                 while (reader.Read())
-                    Console.WriteLine(String.Format("|{0,11}|{1, 4}|", reader[0], reader[1]));
+                {
+                    DataRow dataRow = dataTable.NewRow();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                        dataRow[i] = reader[i];
+                    dataTable.Rows.Add(dataRow);
+                }
                 reader?.Close();
+                CloseConnection();
+                return dataTable;
             }
             else
-                Console.WriteLine("Соединение с бд не установленно");
-            Console.WriteLine();
+                return null;
         }
-        public void Print()
+        public DataTable Print()
         {
-            Console.WriteLine("-Показать все овощи и фрукты, у которых цвет желтый или красный-");
+            DataTable dataTable = new DataTable();
+            connection = OpenConnection();
             if (connection != null)
             {
                 SqlCommand cmd = new SqlCommand("select title_k from Table_f where color_k = 'желтый' or color_k = 'красный'", connection);
                 SqlDataReader reader = cmd.ExecuteReader();
+                for (int i = 0; i < reader.FieldCount; i++)
+                    dataTable.Columns.Add(reader.GetName(i));
                 while (reader.Read())
-                    Console.WriteLine(String.Format("|{0,11}|", reader[0]));
+                {
+                    DataRow dataRow = dataTable.NewRow();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                        dataRow[i] = reader[i];
+                    dataTable.Rows.Add(dataRow);
+                }
                 reader?.Close();
+                CloseConnection();
+                return dataTable;
             }
             else
-                Console.WriteLine("Соединение с бд не установленно");
-            Console.WriteLine();
+                return null;
         }
     }
 }
